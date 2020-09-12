@@ -1,2 +1,3 @@
-# Theatrum
-Web-based media library
+# Standing Echo
+
+Media Player
