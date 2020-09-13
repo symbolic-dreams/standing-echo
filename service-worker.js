@@ -14,10 +14,10 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
 
 importScripts(
-  "/precache-manifest.1b90b98e2eae61b25b516607af2d472c.js"
+  "/standing-echo/precache-manifest.4d2aef69a44911137c92d1a366fcf67b.js"
 );
 
-workbox.core.setCacheNameDetails({prefix: "theatrum"});
+workbox.core.setCacheNameDetails({prefix: "standing-echo"});
 
 self.addEventListener('message', (event) => {
   if (event.data && event.data.type === 'SKIP_WAITING') {
