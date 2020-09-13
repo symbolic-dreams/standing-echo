@@ -35,20 +35,23 @@ html, body {
 
 <template>
   <main id="app">
-    <!--
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js + TypeScript App"/>
-    -->
-    <h1>Hello World</h1>
+    <Player />
   </main>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-//import HelloWorld from './components/HelloWorld.vue';
+//import Navigation from './components/Navigation.vue'
+import Player from './components/Player.vue'
+//import PlayList from './components/PlayList.vue';
+//import Library from './components/Library.vue'
 
 @Component({
-  components: { }
+  components: { Player }
 })
-export default class App extends Vue {}
+export default class App extends Vue {
+  created() {
+    document.title = 'Standing Echo'
+  }
+}
 </script>
