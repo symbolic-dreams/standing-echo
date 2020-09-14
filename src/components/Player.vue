@@ -6,10 +6,14 @@
   box-sizing: border-box;
   border-bottom: 1px solid brown;
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   justify-content: center;
+  align-items: center;
   height: 2in;
   position: relative;
+}
+.seekbar {
+  margin-right: 1em;
 }
 .controls {
   border: none;
@@ -37,8 +41,12 @@
 
 <template>
   <article class="player">
-    <audio></audio>
+    <audio v-on:loadedmetadata="loadedMetadata" v-on:timeupdate="timeUpdate"></audio>
     <input type='file' id='browse' accept="audio/*" v-on:change="browse">
+    <div>
+      <input type="range" class="seekbar" min="0" :max="duration" :value="currentTime" />
+      <time datetime="PT0H00M">{{ durationString }}</time>
+    </div>
     <fieldset class="controls">
       <player-button
        icon="skip-back"
@@ -82,50 +90,64 @@ export default class Player extends Vue {
   private elAudio!: HTMLAudioElement
   private elBrowse!: HTMLInputElement
 
-  mounted(){
-    this.elAudio = this.$el.querySelector('audio') as HTMLAudioElement
-    this.elBrowse =  this.$el.querySelector('#browse') as HTMLInputElement
-    this.$data.isPaused = this.elAudio.paused
-  }
+  currentTime = 0
+  duration = 0
+  isPaused = false
+  trackIndex = -1
+  tracks: string[] = []
 
-  data() {
-    return {
-      isPaused: false,
-      trackIndex: -1,
-      tracks: []
-    }
-  }
-
-  pause() {
-    this.$data.isPaused = true
-    this.elAudio.pause()
-  }
-
-  async play() {
-    if(!this.$data.tracks.length) {
-        return
-    } else {
-      const currentTrack = this.$data.tracks[this.$data.trackIndex]
-      this.elAudio.src = currentTrack
-      this.$data.isPaused = false
-      await this.elAudio.play()
-    }
+  get durationString(): string {
+    const d = new Date(1000 * this.duration).toISOString()
+    return d.substr(11,2) == '00' ? d.substr(14, 5) : d.substr(11, 8)
   }
 
   browse(e: Event) {
     const target = e.target as HTMLInputElement
     this.pause()
-    this.$data.tracks = Array.from(target?.files || [], URL.createObjectURL)
-    this.$data.trackIndex = 0
+    this.tracks.forEach(track => URL.revokeObjectURL(track))
+    this.tracks = Array.from(target?.files || [], URL.createObjectURL)
+    this.trackIndex = 0
     this.play()
+  }
+
+  mounted() {
+    this.elAudio = this.$el.querySelector('audio') as HTMLAudioElement
+    this.elBrowse = this.$el.querySelector('#browse') as HTMLInputElement
+    this.isPaused = this.elAudio.paused
+  }
+
+  pause() {
+    this.isPaused = true
+    this.elAudio.pause()
+  }
+
+  async play() {
+    if(!this.tracks.length) {
+        return
+    } else {
+      const currentTrack = this.tracks[this.trackIndex]
+      this.elAudio.src = currentTrack
+      this.isPaused = false
+      await this.elAudio.play()
+    }
+  }
+
+  loadedMetadata() {
+    this.duration = this.elAudio.duration
   }
 
   skipBack() {
     console.log('skipBack')
   }
+  
   skipForward() {
     console.log('skipForward')
   }
+
+  timeUpdate(){
+    this.currentTime = this.elAudio.currentTime
+  }
+
   open(){
     this.elBrowse.click()
   }

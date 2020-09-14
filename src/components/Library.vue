@@ -18,4 +18,3 @@ export default class Libary extends Vue {
   @Prop() private msg!: string;
 }
 </script>
-
