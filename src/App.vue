@@ -10,6 +10,7 @@
 
   --background-primary: var(--palette6);
   --font-primary: var(--palette4);
+  --disabled-color: var(--palette2);
 }
 
 html, body {
@@ -30,6 +31,8 @@ html, body {
   height: 100%;
   width: 100%;
   overflow: auto;
+  display: flex;
+  flex-direction: column;
 }
 </style>
 
