@@ -8,14 +8,23 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  align-items: center;
+  align-items: stretch;
   height: 2in;
   position: relative;
 }
 .seekbar {
-  margin-right: 1em;
+  display: flex;
+  flex-direction: row;
+}
+.seekbar time {
+  margin: 0 1em;
+}
+.seekbar progress {
+  cursor: pointer;
+  width: 100%;
 }
 .controls {
+  text-align: center;
   border: none;
 }
 #browse {
@@ -41,12 +50,17 @@
 
 <template>
   <article class="player">
-    <audio v-on:loadedmetadata="loadedMetadata" v-on:timeupdate="timeUpdate"></audio>
+    <audio
+     v-on:loadedmetadata="loadedMetadata"
+     v-on:timeupdate="timeUpdate"
+    ></audio>
     <input type='file' id='browse' accept="audio/*" v-on:change="browse">
-    <div>
-      <input type="range" class="seekbar" min="0" :max="duration" :value="currentTime" />
-      <time datetime="PT0H00M">{{ durationString }}</time>
-    </div>
+    <section class="seekbar">
+      <time :datetime="currentTimeFormatString">{{ currentTimeString }}</time>
+      <progress :max="duration" :value="currentTime" v-on:click="progressClick" />
+      <time :datetime="durationFormatString">{{ durationString }}</time>
+    </section>
+    
     <fieldset class="controls">
       <player-button
        icon="skip-back"
@@ -64,8 +78,7 @@
         v-on:click="pause"
         :disabled="trackIndex == -1"
         :hidden="isPaused"
-        title="Pause"
-       />
+        title="Pause" />
       <player-button 
        icon="skip-forward" 
        v-on:click="skipForward" 
@@ -76,15 +89,27 @@
        v-on:click="open" 
        title="Open file(s)" />
     </fieldset>
+    <volume 
+     :loudness="volume"
+     :muted="isMuted"
+     v-on:volume-change="volumeChange" 
+     v-on:max-vol="maxVolume" 
+     v-on:mute-vol="muteVolume" />
   </article>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import PlayerButton from './PlayerButton.vue'
+import Volume from './Volume.vue'
+
+function timeSpan(seconds: number): [string, string, string] {
+  const d = new Date(1000 * seconds).toISOString()
+  return d.substr(11, 8).split(':') as [string, string, string]
+}
 
 @Component({
-  components: { PlayerButton }
+  components: { PlayerButton, Volume }
 })
 export default class Player extends Vue {
   private elAudio!: HTMLAudioElement
@@ -93,21 +118,62 @@ export default class Player extends Vue {
   currentTime = 0
   duration = 0
   isPaused = false
+  isMuted = false
   trackIndex = -1
   tracks: string[] = []
+  volume = 0
+
+  get currentTimeString(): string {
+    const [hh,mm,ss] = timeSpan(this.currentTime)
+    return hh == '00' ? `${mm}:${ss}` : `${hh}:${mm}:${ss}`
+  }
+
+  get currentTimeFormatString(): string {
+    const [hh,mm,ss] = timeSpan(this.currentTime)
+    return `PT${hh}H${mm}M${ss}S`
+  }
 
   get durationString(): string {
-    const d = new Date(1000 * this.duration).toISOString()
-    return d.substr(11,2) == '00' ? d.substr(14, 5) : d.substr(11, 8)
+    const [hh,mm,ss] = timeSpan(this.duration)
+    return hh == '00' ? `${mm}:${ss}` : `${hh}:${mm}:${ss}`
+  }
+
+  get durationFormatString(): string {
+    const [hh,mm,ss] = timeSpan(this.duration)
+    return `PT${hh}H${mm}M${ss}S`
   }
 
   browse(e: Event) {
-    const target = e.target as HTMLInputElement
+    const target = e.target as HTMLInputElement,
+          files = target.files || []
+    if(!files.length)
+      return;
+
     this.pause()
     this.tracks.forEach(track => URL.revokeObjectURL(track))
-    this.tracks = Array.from(target?.files || [], URL.createObjectURL)
-    this.trackIndex = 0
+    Object.assign(this, {
+      tracks: Array.from(target.files || [], URL.createObjectURL),
+      currentTime: 0,
+      duration: 0,
+      isMuted: false,
+      trackIndex: 0,
+      volume: 0
+    })
+    this.elAudio.src = this.tracks[0]
     this.play()
+  }
+
+  loadedMetadata() {
+    this.duration = this.elAudio.duration
+    this.volume = this.elAudio.volume
+  }
+
+  maxVolume() {
+    this.volume = this.elAudio.volume = 1
+  }
+
+  muteVolume() {
+    this.isMuted = this.elAudio.muted = !this.elAudio.muted
   }
 
   mounted() {
@@ -125,15 +191,17 @@ export default class Player extends Vue {
     if(!this.tracks.length) {
         return
     } else {
-      const currentTrack = this.tracks[this.trackIndex]
-      this.elAudio.src = currentTrack
       this.isPaused = false
       await this.elAudio.play()
     }
   }
 
-  loadedMetadata() {
-    this.duration = this.elAudio.duration
+  progressClick(e: MouseEvent){
+    const tg = e.target as HTMLProgressElement,
+          clickPos = (e.pageX  - tg.offsetLeft) / tg.offsetWidth,
+          clickTime = clickPos * this.elAudio.duration;
+
+    this.elAudio.currentTime = clickTime;
   }
 
   skipBack() {
@@ -146,6 +214,10 @@ export default class Player extends Vue {
 
   timeUpdate(){
     this.currentTime = this.elAudio.currentTime
+  }
+
+  volumeChange(value: number) {
+    this.volume = this.elAudio.volume = value
   }
 
   open(){

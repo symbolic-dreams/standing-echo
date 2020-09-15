@@ -44,10 +44,10 @@ html, body {
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-//import Navigation from './components/Navigation.vue'
-import Player from './components/Player.vue'
-//import PlayList from './components/PlayList.vue';
-//import Library from './components/Library.vue'
+//import Navigation from './Navigation.vue'
+import Player from './Player.vue'
+//import PlayList from './PlayList.vue';
+//import Library from './Library.vue'
 
 @Component({
   components: { Player }
