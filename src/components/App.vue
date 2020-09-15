@@ -39,6 +39,7 @@ html, body {
 <template>
   <main id="app">
     <Player />
+    <Playlist />
   </main>
 </template>
 
@@ -46,11 +47,11 @@ html, body {
 import { Component, Vue } from 'vue-property-decorator';
 //import Navigation from './Navigation.vue'
 import Player from './Player.vue'
-//import PlayList from './PlayList.vue';
+import Playlist from './Playlist.vue';
 //import Library from './Library.vue'
 
 @Component({
-  components: { Player }
+  components: { Player, Playlist }
 })
 export default class App extends Vue {
   created() {
