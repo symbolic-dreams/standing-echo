@@ -5,16 +5,16 @@
 </style>
 
 <template>
-  <article class="playlist">
-    <h2>{PlayList}</h2>
-  </article>
+  <details class="playlist">
+    <summary>Playlist</summary>
+  </details>
 </template>
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
 
 @Component
-export default class PlayList extends Vue {
+export default class Playlist extends Vue {
   @Prop() private msg!: string;
 }
 </script>
