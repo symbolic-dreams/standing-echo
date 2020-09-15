@@ -18,4 +18,3 @@ export default class PlayList extends Vue {
   @Prop() private msg!: string;
 }
 </script>
-

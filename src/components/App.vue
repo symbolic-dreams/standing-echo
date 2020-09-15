@@ -26,13 +26,13 @@ html, body {
 }
 
 #app {
+  align-items: stretch;
   background-color: var(--background-primary);
   color: var(--font-primary);
-  height: 100%;
-  width: 100%;
-  overflow: auto;
   display: flex;
   flex-direction: column;
+  height: 100%;
+  overflow: auto;
 }
 </style>
 

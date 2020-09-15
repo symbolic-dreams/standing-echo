@@ -3,26 +3,16 @@
   display: none;
 }
 .player {
+  align-items: stretch;
   box-sizing: border-box;
-  border-bottom: 1px solid brown;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: stretch;
   height: 2in;
+  justify-content: center;
+  max-width: 8.5in;
   position: relative;
 }
-.seekbar {
-  display: flex;
-  flex-direction: row;
-}
-.seekbar time {
-  margin: 0 1em;
-}
-.seekbar progress {
-  cursor: pointer;
-  width: 100%;
-}
+
 .controls {
   text-align: center;
   border: none;
@@ -55,11 +45,7 @@
      v-on:timeupdate="timeUpdate"
     ></audio>
     <input type='file' id='browse' accept="audio/*" v-on:change="browse">
-    <section class="seekbar">
-      <time :datetime="currentTimeFormatString">{{ currentTimeString }}</time>
-      <progress :max="duration" :value="currentTime" v-on:click="progressClick" />
-      <time :datetime="durationFormatString">{{ durationString }}</time>
-    </section>
+    <seekbar :currentTime="currentTime" :duration="duration" v-on:seek-click="seekClick" />
     
     <fieldset class="controls">
       <player-button
@@ -101,15 +87,11 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import PlayerButton from './PlayerButton.vue'
+import Seekbar from './Seekbar.vue'
 import Volume from './Volume.vue'
 
-function timeSpan(seconds: number): [string, string, string] {
-  const d = new Date(1000 * seconds).toISOString()
-  return d.substr(11, 8).split(':') as [string, string, string]
-}
-
 @Component({
-  components: { PlayerButton, Volume }
+  components: { PlayerButton, Volume, Seekbar }
 })
 export default class Player extends Vue {
   private elAudio!: HTMLAudioElement
@@ -122,26 +104,6 @@ export default class Player extends Vue {
   trackIndex = -1
   tracks: string[] = []
   volume = 0
-
-  get currentTimeString(): string {
-    const [hh,mm,ss] = timeSpan(this.currentTime)
-    return hh == '00' ? `${mm}:${ss}` : `${hh}:${mm}:${ss}`
-  }
-
-  get currentTimeFormatString(): string {
-    const [hh,mm,ss] = timeSpan(this.currentTime)
-    return `PT${hh}H${mm}M${ss}S`
-  }
-
-  get durationString(): string {
-    const [hh,mm,ss] = timeSpan(this.duration)
-    return hh == '00' ? `${mm}:${ss}` : `${hh}:${mm}:${ss}`
-  }
-
-  get durationFormatString(): string {
-    const [hh,mm,ss] = timeSpan(this.duration)
-    return `PT${hh}H${mm}M${ss}S`
-  }
 
   browse(e: Event) {
     const target = e.target as HTMLInputElement,
@@ -196,11 +158,7 @@ export default class Player extends Vue {
     }
   }
 
-  progressClick(e: MouseEvent){
-    const tg = e.target as HTMLProgressElement,
-          clickPos = (e.pageX  - tg.offsetLeft) / tg.offsetWidth,
-          clickTime = clickPos * this.elAudio.duration;
-
+  seekClick(clickTime: number){
     this.elAudio.currentTime = clickTime;
   }
 
