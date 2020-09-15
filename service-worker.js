@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
 
 importScripts(
-  "/standing-echo/precache-manifest.720e168ea690b6c281a99fcb8cd04faa.js"
+  "/standing-echo/precache-manifest.b0d55996384c8819da13684d8af715d5.js"
 );
 
 workbox.core.setCacheNameDetails({prefix: "standing-echo"});
