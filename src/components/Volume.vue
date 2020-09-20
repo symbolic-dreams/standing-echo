@@ -9,6 +9,13 @@ progress {
     cursor: pointer;
     width: 100%;
 }
+.player-button {
+  background: var(--background-gradient);
+  border-radius: 50%;
+  margin: 0 1em;
+  height: 48px;
+  width: 48px;
+}
 </style>
 
 <template>

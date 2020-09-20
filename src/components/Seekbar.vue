@@ -8,7 +8,7 @@
 }
 .seekbar progress {
   cursor: pointer;
-  width: 100%;
+  width: calc(100% - 96px);
 }
 </style>
 
