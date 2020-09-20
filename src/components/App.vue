@@ -42,7 +42,7 @@ html, body {
 </style>
 
 <template>
-  <main id="app">
+  <main id="app" role="application">
     <player />
     <playlist />
   </main>

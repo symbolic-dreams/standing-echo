@@ -44,13 +44,13 @@ export default new Vuex.Store({
         }
     },
     actions: {
-        async addTrack({ commit }, blob: Blob) {
+        async addTrack({ commit }, {blob, defaultName}: {blob: Blob; defaultName: string}) {
             const blobUrl = URL.createObjectURL(blob)
             const track = new Track({
                 blobUrl,
                 duration: await calcDuration(blobUrl),
                 mimeType: blob.type,
-                title: '{UNTITLED}'
+                title: defaultName
             })
             commit('addTrack', track)
         }
