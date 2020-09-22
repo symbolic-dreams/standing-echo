@@ -5,9 +5,10 @@
   --palette2: #66757F;
   --palette3: #CCD6DD;
   --palette4: #E1E8ED;
-  --palette5: #FFFFFF;
-  --palette6: #000000;
+  --palette5: rgb(255,255,255);
+  --palette6: rgb(0,0,0);
   --palette7: rgb(4,20,27);
+  --palette8: rgb(0, 117, 255);
 
   --background-primary: var(--palette0);
   --background-gradient: linear-gradient(0deg, var(--palette6), transparent);
@@ -32,6 +33,7 @@ html, body {
   display: flex;
   flex-direction: column;
   height: 100%;
+  margin: auto;
   max-width: 8.5in;
   overflow: auto;
 }

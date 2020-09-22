@@ -18,23 +18,31 @@
     padding: 0.5em;
     user-select: none;
 }
-.playlist td:hover {
-    cursor: pointer;
+.playlist-empty td {
+    text-align: center;
+}
+.playlist tr:nth-child(even) {
+    background-color: var(--palette7)
+}
+.playlist tr.active {
+    background-color: var(--palette8);
 }
 </style>
 
 <template>
 <table class="playlist">
     <thead>
-        <th>Title</th>
-        <th>Length</th>
-        <th>Type</th>
+        <tr>
+            <th>Title</th>
+            <th>Length</th>
+            <th>Type</th>
+        </tr>
     </thead>
-    <tbody v-if="tracks.length == 0">
-        <tr><td colspan="3">-- empty --</td></tr>
+    <tbody v-if="tracks.length == 0" class="playlist-empty">
+        <tr><td colspan="3">&mdash; empty &mdash;</td></tr>
     </tbody>
     <tbody v-if="tracks.length">
-        <tr v-for="track in tracks" :key="track.blobUrl">
+        <tr v-for="track in tracks" :key="track.blobUrl" :class="{active: track === currentTrack}">
             <td>{{track.title}}</td>
             <td>{{track.durationString}}</td>
             <td>{{track.mimeType}}</td>
@@ -49,10 +57,12 @@ import { mapGetters } from 'vuex'
 import Track from '@/models/Track'
 
 @Component({
-    computed: mapGetters(['tracks'])
+    computed: mapGetters(['currentTrack','tracks'])
 })
 export default class Playlist extends Vue {
     // Type the mapped 'tracks' getter.
     tracks!: Track[]
+    // Type the mapped 'currentTrack' getter.
+    currentTrack!: Track;
 }
 </script>

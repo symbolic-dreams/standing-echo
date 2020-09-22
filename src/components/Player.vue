@@ -44,6 +44,7 @@
       :src="currentTrack && currentTrack.blobUrl || ''"
       v-on:loadedmetadata="loadedMetadata"
       v-on:timeupdate="timeUpdate"
+      v-on:ended="ended"
     ></audio>
     <input type="file" id="browse" accept="audio/*" v-on:change="browse" multiple />
     <seekbar
@@ -120,7 +121,7 @@ export default class Player extends Vue {
   private isPaused = true;
   pause() {
     this.isPaused = true;
-    if (this.elAudio) this.elAudio.pause();
+    this.elAudio.pause();
   }
 
   async browse(e: Event) {
@@ -138,10 +139,21 @@ export default class Player extends Vue {
     );
     this.$store.commit("setTrackIndex", 0);
 
+    this.elAudio.load()
     this.play();
   }
 
+  ended() {
+    if(this.currentTime >= this.currentTrack.duration) {
+      this.skipForward()
+    } else {
+      console.log('PAUSE')
+      this.pause()
+    }
+  }
+
   loadedMetadata() {
+    this.play()
     this.volume = this.elAudio.volume;
   }
 
@@ -168,11 +180,20 @@ export default class Player extends Vue {
   }
 
   skipBack() {
-    console.log("skipBack");
+    this.pause()
+    this.currentTime = 0
+    if(this.trackIndex <= 0)
+      return;
+    this.$store.commit('setTrackIndex', this.trackIndex - 1)
   }
 
   skipForward() {
-    console.log("skipForward");
+    this.pause()
+    this.currentTime = 0
+    if(!this.currentTrack || this.trackIndex >= this.tracks.length - 1)
+      return;
+
+    this.$store.commit('setTrackIndex', this.trackIndex + 1)
   }
 
   timeUpdate() {

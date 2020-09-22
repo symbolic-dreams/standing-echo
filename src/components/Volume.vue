@@ -55,7 +55,8 @@ export default class Volume extends Vue {
 
   volumeChange(e: MouseEvent){
     const tg = e.target as HTMLProgressElement,
-          clickPos = (e.pageX  - tg.offsetLeft) / tg.offsetWidth;
+          rect = tg.getBoundingClientRect(),
+          clickPos = (e.pageX  - rect.left) / rect.width;
     this.$emit('volume-change', clickPos)
   }
 }
