@@ -42,7 +42,7 @@
         <tr><td colspan="3">&mdash; empty &mdash;</td></tr>
     </tbody>
     <tbody v-if="tracks.length">
-        <tr v-for="track in tracks" :key="track.blobUrl" :class="{active: track === currentTrack}">
+        <tr v-for="track in tracks" :key="track.blobUrl" :class="{active: track === currentTrack}" v-on:click="trackClick(track, $event)">
             <td>{{track.title}}</td>
             <td>{{track.durationString}}</td>
             <td>{{track.mimeType}}</td>
@@ -64,5 +64,9 @@ export default class Playlist extends Vue {
     tracks!: Track[]
     // Type the mapped 'currentTrack' getter.
     currentTrack!: Track;
+
+    trackClick(track: Track) {
+        this.$store.commit('setTrack', track)
+    }
 }
 </script>

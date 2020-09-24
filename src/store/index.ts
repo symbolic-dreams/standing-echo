@@ -59,6 +59,12 @@ export default new Vuex.Store({
         addTrack(state, track: Track) {
             state.tracks.push(track)
         },
+        setTrack(state, track: Track) {
+            const i = state.tracks.indexOf(track)
+            if (i < 0 || i > state.tracks.length)
+                throw new TypeError('Index out of bounds')
+            state.trackIndex = i
+        },
         setTrackIndex(state, i: number) {
             if (i < 0 || i > state.tracks.length)
                 throw new TypeError('Index out of bounds')
